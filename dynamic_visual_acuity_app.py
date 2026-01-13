@@ -18,13 +18,14 @@ TEXTS = {
 ### テストの流れ:
 1. **移動ターゲットテスト**: 画面上の広いグリッドにランダムな位置でターゲットが表示されます。
    目を動かして、できるだけ素早くターゲットをクリックしてください！
-2. 15回のトライアルを実施します。各トライアルでターゲットは異なる位置に表示されます。
+2. **5回×10セット = 合計50トライアル**を実施します。各トライアルでターゲットは異なる位置に表示されます。
 3. **結果**: 反応時間、正確性、パフォーマンス指標を確認できます。
 
 **動的視力をテストする準備はできましたか？下のボタンをクリックして開始しましょう！**
         """,
         'test_area': '🏁 テストエリア',
         'start_test': '🚀 テスト開始',
+        'set_of': 'セット',
         'trial_of': 'トライアル',
         'instruction': '🎯 ターゲット（🎯）をできるだけ速くクリックしてください！画面全体に目を動かしましょう！',
         'hit': 'ヒット！',
@@ -77,13 +78,14 @@ scenarios where you need to move your eyes to track moving objects.
 ### How the test works:
 1. **Moving Target Test**: Targets will appear in random positions across a wide grid on your screen.
    Move your eyes and click the targets as quickly as possible!
-2. You will complete 15 trials where each target appears in a different location.
+2. You will complete **5 trials × 10 sets = 50 total trials**. Each target appears in a different location.
 3. **Results**: You'll see your reaction times, accuracy, and performance metrics.
 
 **Ready to test your dynamic visual acuity? Click the button below to begin!**
         """,
         'test_area': '🏁 Test Area',
         'start_test': '🚀 Start Test',
+        'set_of': 'Set',
         'trial_of': 'Trial',
         'instruction': '🎯 Click the target (🎯) as quickly as you can! Move your eyes across the screen!',
         'hit': 'Hit!',
@@ -145,8 +147,10 @@ if 'language' not in st.session_state:
     st.session_state.language = 'ja'  # Default to Japanese
 
 # Configuration
-NUM_MOVING_TARGETS = 15  # Number of moving target trials
-GRID_ROWS = 3  # Number of rows in the grid
+TRIALS_PER_SET = 5  # Number of trials per set
+NUM_SETS = 10  # Number of sets
+NUM_MOVING_TARGETS = TRIALS_PER_SET * NUM_SETS  # Total trials: 50
+GRID_ROWS = 9  # Number of rows in the grid (3x original)
 GRID_COLS = 6  # Number of columns in the grid
 
 # ============================================================================
@@ -205,7 +209,12 @@ if not st.session_state.test_started and not st.session_state.test_complete:
 if st.session_state.test_started and not st.session_state.test_complete:
 
     if st.session_state.moving_target_trials < NUM_MOVING_TARGETS:
-        st.subheader(f"{t['trial_of']} {st.session_state.moving_target_trials + 1} / {NUM_MOVING_TARGETS}")
+        # Calculate current set and trial within set
+        current_trial = st.session_state.moving_target_trials
+        current_set = (current_trial // TRIALS_PER_SET) + 1
+        trial_in_set = (current_trial % TRIALS_PER_SET) + 1
+
+        st.subheader(f"{t['set_of']} {current_set}/{NUM_SETS} - {t['trial_of']} {trial_in_set}/{TRIALS_PER_SET}")
         st.write(t['instruction'])
 
         # Record start time for moving target
